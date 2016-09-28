@@ -8,7 +8,10 @@ class StaticPagesController < ApplicationController
   end
 
   def about
-    @title = 'About'
+  end
+
+  def contacts
+
   end
 
 end
