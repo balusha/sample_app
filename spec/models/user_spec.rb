@@ -61,7 +61,7 @@ RSpec.describe User, type: :model do
   end
 
   describe 'when email adress is already taken' do
-    before() do
+    before do
       user_dup = @user.dup
       user_dup.email.upcase!
       user_dup.save
@@ -90,6 +90,12 @@ RSpec.describe User, type: :model do
       it {should_not be_valid}
     end
 
+  end
+
+  describe "must have remember_token" do
+    before {@user.save}
+    #its (:remember_token){should_not be_blank}
+    it {expect(@user.remember_token).not_to be_blank}
   end
 
 end
