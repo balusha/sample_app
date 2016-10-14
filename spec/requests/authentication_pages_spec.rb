@@ -26,7 +26,7 @@ RSpec.describe "AuthenticationPages", type: :request do
 
     end
 
-    describe "with invalid information" do
+    describe "with valid information" do
 
       let(:user){FactoryGirl.create(:user)}
 
