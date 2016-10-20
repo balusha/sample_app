@@ -34,4 +34,13 @@ module SessionsHelper
 		self.current_user = nil
 	end
 
+	def store_location
+		session[:return_to] = request.url if request.get?
+	end
+
+	def redirect_back_or(default = root_url)
+		redirect_to session[:return_to] || default
+		session.delete(:return_to)
+	end
+
 end

@@ -92,4 +92,24 @@ RSpec.describe "UserPages", type: :request do
     end
 
   end
+
+  describe 'index page' do
+    before do
+      sign_in FactoryGirl.create :user
+      FactoryGirl.create :user, name:'Ben', email:'ben@example.com'
+      FactoryGirl.create :user, name:'Bob', email:'bob@example.com'
+      visit users_path
+    end
+
+    it {should have_title 'All users'}
+    it {should have_content 'All users'}
+
+    it 'should list each user' do
+      User.all.each do |user|
+        expect(page).to have_selector 'li', text: user.name
+      end
+    end
+
+  end
+
 end

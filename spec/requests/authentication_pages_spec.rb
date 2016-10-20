@@ -38,7 +38,8 @@ RSpec.describe "AuthenticationPages", type: :request do
 
       it {should have_title user.name}
       it {should have_link 'Profile', href: user_path(user)}
-      it { should have_link 'Settings', href: edit_user_path(user) }
+      it {should have_link 'Settings', href: edit_user_path(user) }
+      it {should have_link 'Users', href: users_path }
       it {should have_link 'Sign out', href: signout_path}
       it {should_not have_link 'Sign out', href: signin_path}
 
@@ -71,10 +72,37 @@ RSpec.describe "AuthenticationPages", type: :request do
           it { should have_link 'Sign in', href: signin_path }
         end
 
+        describe 'visiting the users index' do
+          before { visit users_path(user) }
+          it { should have_title 'Sign in' }
+        end
+
         describe "submitting to the update action" do
           before { patch user_path(user) }
           specify { expect(response).to redirect_to signin_path }
         end
+      end
+
+      describe 'when attempting to visit protected page' do
+          before do
+            visit edit_user_path user
+            fill_in 'Email'   , with: user.email
+            fill_in 'Password', with: user.password
+            click_button 'Sign in'
+          end
+          it{should have_title 'Edit user'}
+
+          describe 'and then sign out and sign in again' do
+            before do
+              click_link 'Sign out'
+              visit signin_url
+              fill_in 'Email'   , with: user.email
+              fill_in 'Password', with: user.password
+              click_button 'Sign in'
+            end
+            it {should have_title user.name}
+          end
+
       end
     end
 
