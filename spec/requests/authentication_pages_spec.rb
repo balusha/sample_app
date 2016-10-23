@@ -106,6 +106,30 @@ RSpec.describe "AuthenticationPages", type: :request do
       end
     end
 
+    describe "as non-admin user" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:non_admin) { FactoryGirl.create(:user) }
+
+      before { sign_in non_admin, no_capybara: true }
+
+      describe "submitting a DELETE request to the User#destroy action" do
+        before { delete(user_path(user)) }
+        specify { expect(response).to redirect_to(root_url) }
+      end
+
+    end
+
+    describe "as an admin user" do
+      let(:admin) { FactoryGirl.create(:admin) }
+      before { sign_in admin, no_capybara: true }
+
+      describe "submitting a DELETE request to the User#destroy action" do
+        before { delete(user_path(admin)) }
+        specify { expect(response).to redirect_to(root_url) }
+      end
+
+    end
+
     describe "as wrong user" do
       let(:user) { FactoryGirl.create(:user) }
       let(:wrong_user) { FactoryGirl.create(:user, email: 'wrong@example.com') }
