@@ -5,6 +5,7 @@ class UsersController < ApplicationController
   before_action :signed_in_user, only: [:edit, :update, :index]
   before_action :correct_user, only: [:edit, :update]
   before_action :deletion_allowed, only: [:destroy]
+  before_action :unsigned_in_user, only: [:new, :create]
 
   def new
     @user = User.new
@@ -73,6 +74,12 @@ class UsersController < ApplicationController
     user = User.find(params[:id])
     if !current_user.admin? || current_user.admin && current_user?(user)
       redirect_to root_url
+    end
+  end
+
+  def unsigned_in_user
+    if signed_in?
+      redirect_to current_user, notice: 'You are already have an account'
     end
   end
 
