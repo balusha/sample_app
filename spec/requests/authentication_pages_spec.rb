@@ -24,6 +24,10 @@ RSpec.describe "AuthenticationPages", type: :request do
       it {should have_title "Sign in"}
       it {should have_selector "div.alert.alert-error"}
 
+      it { should_not have_link 'Profile' }
+      it { should_not have_link 'Settings' }
+      it { should_not have_link 'Users', href: users_path }
+
     end
 
     describe "with valid information" do
@@ -104,6 +108,72 @@ RSpec.describe "AuthenticationPages", type: :request do
           end
 
       end
+    end
+
+    describe "for signed users" do
+      let(:new_user) do
+        FactoryGirl.build(:user)
+      end
+      before { sign_in FactoryGirl.create(:user), no_capybara: true }
+
+      describe "submitting POST for User#create action" do
+
+        it "shouldn`t create new user" do
+          expect do
+            post users_path, params: {
+                               user: {
+                                   id: new_user.id,
+                                   name: new_user.name,
+                                   email: new_user.email,
+                                   password: new_user.password,
+                                   password_confirmation: new_user.password_confirmation
+                               }
+                           }
+          end.to_not change(User, :count)
+        end
+      end
+
+    end
+
+    describe "as non-admin user" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:non_admin) { FactoryGirl.create(:user) }
+
+      before { sign_in non_admin, no_capybara: true }
+
+      describe "submitting a DELETE request to the User#destroy action" do
+        before { delete(user_path(user)) }
+        specify { expect(response).to redirect_to(root_url) }
+      end
+
+      describe "sending patch command to User#update action" do
+        before do
+          patch(user_path(non_admin, params: {
+                                       user: {
+                                           id: non_admin.id,
+                                           name: non_admin.name,
+                                           emial: non_admin.email,
+                                           password: non_admin.password,
+                                           password_confirmation: non_admin.password_confirmation,
+                                           admin: true
+                                       }
+                                   }))
+        end
+        specify { expect(non_admin.reload.admin).to eq false }
+      end
+
+
+    end
+
+    describe "as an admin user" do
+      let(:admin) { FactoryGirl.create(:admin) }
+      before { sign_in admin, no_capybara: true }
+
+      describe "submitting a DELETE request to the User#destroy action" do
+        before { delete(user_path(admin)) }
+        specify { expect(response).to redirect_to(root_url) }
+      end
+
     end
 
     describe "as wrong user" do

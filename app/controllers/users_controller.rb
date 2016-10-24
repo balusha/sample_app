@@ -2,8 +2,10 @@ class UsersController < ApplicationController
 
   include SessionsHelper
 
-  before_action :signed_in_user, only: [:edit, :update]
+  before_action :signed_in_user, only: [:edit, :update, :index]
   before_action :correct_user, only: [:edit, :update]
+  before_action :deletion_allowed, only: [:destroy]
+  before_action :unsigned_in_user, only: [:new, :create]
 
   def new
     @user = User.new
@@ -14,7 +16,7 @@ class UsersController < ApplicationController
   end
 
   def index
-    @users = User.all
+    @users = User.paginate(page: params[:page])
   end
 
   def create
@@ -43,6 +45,12 @@ class UsersController < ApplicationController
     end
   end
 
+  def destroy
+    User.delete params[:id]
+    flash[:success] = "User deleted"
+    redirect_to users_url
+  end
+
   private
 
   def user_params
@@ -59,6 +67,20 @@ class UsersController < ApplicationController
   def correct_user
     @user = User.find(params[:id])
     redirect_to root_url unless current_user?(@user)
+  end
+
+  def deletion_allowed
+
+    user = User.find(params[:id])
+    if !current_user.admin? || current_user.admin && current_user?(user)
+      redirect_to root_url
+    end
+  end
+
+  def unsigned_in_user
+    if signed_in?
+      redirect_to current_user, notice: 'You are already have an account'
+    end
   end
 
 end
