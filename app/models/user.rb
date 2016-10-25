@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  has_many :microposts
+  has_many :microposts, dependent: :destroy
   before_save {self.email.downcase!}
   before_create :refresh_remember_token
 
