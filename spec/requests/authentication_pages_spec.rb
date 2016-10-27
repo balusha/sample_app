@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'support\utilities'
 
 RSpec.describe "AuthenticationPages", type: :request do
 
@@ -106,8 +107,22 @@ RSpec.describe "AuthenticationPages", type: :request do
             end
             it {should have_title user.name}
           end
+      end
+
+      describe "in the Microposts controller" do
+
+        describe "submitting create action" do
+          before { post microposts_path }
+          specify { expect(response).to redirect_to signin_url }
+        end
+
+        describe "submitting destroy action" do
+          before { delete micropost_path(FactoryGirl.create :micropost) }
+          specify { expect(response).to redirect_to signin_url }
+        end
 
       end
+
     end
 
     describe "for signed users" do

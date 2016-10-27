@@ -43,4 +43,19 @@ module SessionsHelper
 		session.delete(:return_to)
 	end
 
+	private
+
+		def signed_in_user
+		 unless signed_in?
+		    store_location
+		    redirect_to signin_url, notice: 'Please sign in'
+		 end
+		end
+
+		def unsigned_in_user
+		  if signed_in?
+	  	    redirect_to current_user, notice: 'You are already have an account'
+		  end
+		end
+
 end
