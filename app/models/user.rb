@@ -17,6 +17,10 @@ class User < ApplicationRecord
   	Digest::SHA1.hexdigest token
   end
 
+  def feed
+    Micropost.where("user_id = ?", self.id)
+  end
+
   private	
 
     def refresh_remember_token
