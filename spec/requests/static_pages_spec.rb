@@ -5,6 +5,7 @@ RSpec.describe 'StaticPages', type: :request do
   subject { page }
 
   describe "Home page" do
+
     before { visit root_path }
     it { should have_content('SAMPLE APP') }
     it { should have_title('Rails Sample') }
@@ -29,9 +30,28 @@ RSpec.describe 'StaticPages', type: :request do
         end
       end
 
-    end
+      it "should have sidebar with mposts count" do
+        expect(page).to have_selector("aside", text: "#{user.microposts.count} #{"micropost".pluralize(user.microposts.count)}")
+      end
 
+      describe "pagination" do
+
+        before do
+          35.times { FactoryGirl.create :micropost, user: user }
+          visit root_url
+        end
+
+        it { should have_selector "div.pagination" }
+
+        it "should list each post" do
+          user.microposts.paginate(page: 1).each do |micropost|
+            expect(page).to have_selector "li##{micropost.id}"
+          end
+        end
+      end
+    end
   end
+
 
   describe "Help page" do
 

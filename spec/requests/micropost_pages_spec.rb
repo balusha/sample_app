@@ -42,5 +42,17 @@ RSpec.describe "MicropostPages", type: :request do
 				expect { click_link "delete" }.to change(Micropost, :count).by(-1)
 			end
 		end
+
+	end
+
+	describe "for other users microposts" do
+		let(:another_user) { FactoryGirl.create :user }
+		before do
+			FactoryGirl.create :micropost, user: another_user
+			visit user_path another_user
+		end
+
+		it { should_not have_link "delete" }
+
 	end
 end
