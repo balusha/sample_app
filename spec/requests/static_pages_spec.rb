@@ -30,6 +30,16 @@ RSpec.describe 'StaticPages', type: :request do
         end
       end
 
+      describe "followers/followed counts" do
+        let(:other_user) { FactoryGirl.create :user }
+        before do
+          other_user.follow! user
+          visit root_url
+        end
+         it { should have_link "0 following", href:following_user_path(user)}
+        it { should have_link "1 followers", href:followers_user_path(user)}
+      end
+
       it "should have sidebar with mposts count" do
         expect(page).to have_selector("aside", text: "#{user.microposts.count} #{"micropost".pluralize(user.microposts.count)}")
       end
