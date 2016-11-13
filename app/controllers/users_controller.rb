@@ -2,7 +2,7 @@ class UsersController < ApplicationController
 
   include SessionsHelper
 
-  before_action :signed_in_user, only: [:edit, :update, :index]
+  before_action :signed_in_user, only: [:edit, :update, :index, :following, :followers]
   before_action :correct_user, only: [:edit, :update]
   before_action :deletion_allowed, only: [:destroy]
   before_action :unsigned_in_user, only: [:new, :create]
@@ -50,6 +50,20 @@ class UsersController < ApplicationController
     User.delete params[:id]
     flash[:success] = "User deleted"
     redirect_to users_url
+  end
+
+  def following
+    @title = "Following"
+    @user = User.find(params[:id])
+    @users = @user.followed_users.paginate(page: params[:page])
+    render "show_follow"
+  end
+
+  def followers
+    @title = "Followers"
+    @user = User.find(params[:id])
+    @users = @user.followers.paginate(page: params[:page])
+    render "show_follow"
   end
 
   private
