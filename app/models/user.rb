@@ -14,6 +14,10 @@ class User < ApplicationRecord
   has_secure_password
   validates :password, length: {minimum: 6}
 
+  def self.from_users_followed_by(user)
+    where('id = ?', user)    
+  end
+
   def self.new_remember_token
   	SecureRandom.urlsafe_base64
   end
@@ -23,7 +27,8 @@ class User < ApplicationRecord
   end
 
   def feed
-    Micropost.where("user_id = ?", self.id)
+    #Micropost.where("user_id = ?", self.id)
+    Micropost.from_users_followed_by(self)
   end
 
   def following?(other_user)

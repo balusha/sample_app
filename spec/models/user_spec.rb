@@ -116,7 +116,6 @@ RSpec.describe User, type: :model do
 
   describe "must have remember_token" do
     before {@user.save}
-    #its (:remember_token){should_not be_blank}
     it {expect(@user.remember_token).not_to be_blank}
   end
 
@@ -142,10 +141,21 @@ RSpec.describe User, type: :model do
     describe "status" do
 
       let (:unfollowed_micropost) { FactoryGirl.create(:micropost, user: FactoryGirl.create(:user)) }
+      let (:followed_user) { FactoryGirl.create :user }
+
+      before do
+        @user.follow! followed_user
+        3.times { followed_user.microposts.create!(content: 'Lorem ipsum') }
+      end
 
       specify { expect(@user.feed).to include(newer_micropost) }
       specify { expect(@user.feed).to include(older_micropost) }
       specify { expect(@user.feed).not_to include(unfollowed_micropost) }
+      specify do
+        followed_user.microposts.each do |micropost|
+          expect(@user.feed).to include(micropost)
+        end
+      end
     end
 
   end
