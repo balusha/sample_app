@@ -5,22 +5,21 @@ class RelationshipsController < ApplicationController
 	before_action :signed_in_user
 
 	def create
-		rel = Relationship.create(relation_params)
-		rel.follower_id = current_user.id
-
-		rel.save
-
-		redirect_to user_path(rel.followed_id)
+		@user = User.find(params[:relationship][:followed_id])
+		current_user.follow! @user
+		respond_to do |format|
+			format.html { redirect_to @user }
+			format.js
+		end
 	end
 
 	def destroy
-
-		rel = Relationship.find(params[:id])
-		unfollowed_id = rel.followed_id
-
-		rel.destroy
-		redirect_to user_path(unfollowed_id)
-
+		@user = Relationship.find(params[:id]).followed
+		current_user.unfollow! @user
+		respond_to do |format|
+			format.html { redirect_to @user }
+			format.js
+		end
 	end
 
 	private 

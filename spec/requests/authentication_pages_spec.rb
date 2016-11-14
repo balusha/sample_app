@@ -86,6 +86,17 @@ RSpec.describe "AuthenticationPages", type: :request do
           before { patch user_path(user) }
           specify { expect(response).to redirect_to signin_path }
         end
+
+        describe "visiting the following page" do
+          before { visit following_user_path(user) }
+          it { should have_content "Sign in" }
+        end
+
+        describe "visiting the followers page" do
+          before { visit followers_user_path(user) }
+          it { should have_content "Sign in" }
+        end
+
       end
 
       describe 'when attempting to visit protected page' do
@@ -176,8 +187,6 @@ RSpec.describe "AuthenticationPages", type: :request do
         end
         specify { expect(non_admin.reload.admin).to eq false }
       end
-
-
     end
 
     describe "as an admin user" do
